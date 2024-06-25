@@ -8,6 +8,8 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.9"
 
+[tool.black]
+line-length = 79
 
 [build-system]
 requires = ["poetry-core"]

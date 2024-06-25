@@ -1,3 +1,5 @@
+default_language_version:
+    python: python3.10
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.5.0
@@ -31,6 +33,11 @@ repos:
     hooks:
       - id: black
         files: '\.py$'
+
+  - repo: https://github.com/PyCQA/bandit
+    rev: 1.7.9
+    hooks:
+    - id: bandit
 
   - repo: https://github.com/executablebooks/mdformat
     rev: 0.7.17
