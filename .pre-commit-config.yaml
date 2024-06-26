@@ -34,10 +34,17 @@ repos:
       - id: black
         files: '\.py$'
 
+  - repo: https://github.com/pycqa/flake8
+    rev: 7.1.0
+    hooks:
+      - id: flake8
+        files: '\.py$'
+
   - repo: https://github.com/PyCQA/bandit
     rev: 1.7.9
     hooks:
     - id: bandit
+      files: '\.py$'
 
   - repo: https://github.com/executablebooks/mdformat
     rev: 0.7.17
