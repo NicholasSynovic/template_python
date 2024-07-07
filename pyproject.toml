@@ -6,11 +6,8 @@ authors = ["Nicholas M. Synovic <nicholas.synovic@gmail.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.9"
-sphinx = "^7.3.7"
+python = "^3.10"
 
-[tool.black]
-line-length = 79
 
 [build-system]
 requires = ["poetry-core"]
