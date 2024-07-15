@@ -23,9 +23,9 @@ repos:
       - id: trailing-whitespace
 
   - repo: https://github.com/regebro/pyroma
-    rev: 4.2
+    rev: "4.2"
     hooks:
-    -   id: pyroma
+      - id: pyroma
 
   - repo: https://github.com/PyCQA/isort
     rev: 5.13.2
