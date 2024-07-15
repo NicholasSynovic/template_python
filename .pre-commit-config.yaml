@@ -22,6 +22,11 @@ repos:
       - id: sort-simple-yaml
       - id: trailing-whitespace
 
+  - repo: https://github.com/regebro/pyroma
+    rev: "3.2"
+    hooks:
+    -   id: pyroma
+
   - repo: https://github.com/PyCQA/isort
     rev: 5.13.2
     hooks:
