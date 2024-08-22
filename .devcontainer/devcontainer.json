@@ -1,11 +1,13 @@
-// https://containers.dev/implementors/json_reference
-
 {
     "name": "Project Devcontainer",
-    "image": "alpine:latest",
+    "image": "python:3.10-bookworm",
     "customizations": {
         "vscode": {
-            "settings": {},
+            "settings": {
+                "editor.wordWrapColumn": 79,
+                "editor.wordWrap": "bounded"
+
+        },
             "extensions": [
                 "streetsidesoftware.code-spell-checker",
                 "adpyke.codesnap",
@@ -15,6 +17,9 @@
                 "vscode-icons-team.vscode-icons",
                 "ms-azuretools.vscode-docker",
                 "ms-vscode.makefile-tools",
+                "njpwerner.autodocstring",
+                "ms-python.python",
+                "ms-python.debugpy"
             ]
         }
     }

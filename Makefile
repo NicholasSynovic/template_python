@@ -1,11 +1,20 @@
 build:
-	echo "Hello World"
+	poetry build
+	pip install dist/*.tar.gz
 
 build-docs:
-	echo "Hello World"
+	sphinx-build --builder html src-docs build-docs
 
 create-dev:
 	pre-commit install
+	rm -rf env
+	python3.10 -m venv env
+	( \
+		. env/bin/activate; \
+		pip install -r requirements.txt; \
+		poetry install; \
+		deactivate; \
+	)
 
 create-docs:
-	echo "Hello World"
+	sphinx-apidoc src --output-dir src-docs --maxdepth 100 --separate
