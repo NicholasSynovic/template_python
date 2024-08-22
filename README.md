@@ -1,6 +1,7 @@
 # Python Template Repository
 
->  A template repository that Python projects can inherit from to ensure tooling consistency
+> A template repository that Python projects can inherit from to ensure tooling
+> consistency
 
 ## Table of Contents
 
@@ -26,6 +27,7 @@ The following tooling is supported:
 - [Python .gitignore](.gitignore)
 - [Pypi Requirements](requirements.txt)
   - [Poetry](.pyproject.toml)
+  - Sphinx
 - [Python pre-commit hooks](.pre-commit-config.yaml)
   - Pyroma
   - [isort](.isort.cfg)
