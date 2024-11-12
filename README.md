@@ -17,6 +17,7 @@
     - [Poetry](#poetry)
     - [Pre-Commit](#pre-commit)
       - [Hooks](#hooks)
+  - [Encouraged Tooling](#encouraged-tooling)
   - [Template Structure](#template-structure)
 
 ## About
@@ -92,6 +93,19 @@ extending this template is encouraged
 - [isort](https://pycqa.github.io/isort/)
   - Config: [.isort.cfg](.isort.cfg)
 - [bandit](https://bandit.readthedocs.io/en/latest/)
+
+## Encouraged Tooling
+
+For API docs, please consider using one of the following:
+
+- [Sphinx](https://www.sphinx-doc.org/en/master/)
+  - [Built-in themes](https://www.sphinx-doc.org/en/master/usage/theming.html#builtin-themes)
+  - [Themes](https://sphinx-themes.readthedocs.io/en/latest/)
+  - [Extensions](https://awesomesphinx.useblocks.com/)
+- [MkDocs](https://www.mkdocs.org/)
+  - [Built-in themes](https://www.mkdocs.org/user-guide/choosing-your-theme/)
+  - [Themes](https://github.com/mkdocs/mkdocs/wiki/MkDocs-Themes)
+  - [Extensions](https://github.com/mkdocs/catalog)
 
 ## Template Structure
 
