@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "src"
-version = "0.1.0"
+version = "0.0.0"
 description = "Hello World"
 license = "GNU Affero"
 authors = ["Nicholas M. Synovic <nicholas.synovic@gmail.com>"]
@@ -13,7 +13,13 @@ classifiers = ["Development Status :: 1 - Planning"]
 [tool.poetry.dependencies]
 python = "^3.10"
 
+[tool.poetry-dynamic-versioning]
+enable = true
+vcs = "git"
+metadata = false
+pattern = "(?P<base>\\d.\\d.\\d+)"
+format = "v{base}"
 
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = ["poetry-core", "poetry-dynamic-versioning>=1.0.0,<2.0.0"]
+build-backend = "poetry_dynamic_versioning.backend"
