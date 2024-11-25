@@ -1,3 +1,2 @@
 poetry
-poetry-dynamic-versioning[plugin]
 pyinstaller

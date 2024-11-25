@@ -1,14 +1,8 @@
 build:
+	git --no-pager tag | tail -n 1 | xargs -I % poetry version %
+	poetry version --short > src/_version
 	poetry build
 	pip install dist/*.tar.gz
-	poetry version --short > ip2email/_version
-	pyinstaller --clean \
-		--onefile \
-		--add-data ./ip2email/_version:. \
-		--workpath ./pyinstaller \
-		--name ip2email \
-		--hidden-import ip2email \
-		ip2email/main.py
 
 create-dev:
 	pre-commit install
@@ -20,3 +14,12 @@ create-dev:
 		poetry install; \
 		deactivate; \
 	)
+
+package:
+	pyinstaller --clean \
+		--onefile \
+		--add-data ./src/_version:. \
+		--workpath ./pyinstaller \
+		--name src \
+		--hidden-import src \
+		src/main.py

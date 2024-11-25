@@ -13,13 +13,7 @@ classifiers = ["Development Status :: 1 - Planning"]
 [tool.poetry.dependencies]
 python = "^3.10"
 
-[tool.poetry-dynamic-versioning]
-enable = true
-vcs = "git"
-metadata = false
-pattern = "(?P<base>\\d.\\d.\\d+)"
-format = "v{base}"
 
 [build-system]
-requires = ["poetry-core", "poetry-dynamic-versioning>=1.0.0,<2.0.0"]
-build-backend = "poetry_dynamic_versioning.backend"
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
