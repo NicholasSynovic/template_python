@@ -1,13 +1,15 @@
 from collections import defaultdict
-from json import dump
+from os import makedirs
 from pathlib import Path
 from string import Template
 from typing import List
 
 import click
 from bs4 import BeautifulSoup, Tag
+from pandas import DataFrame, Series
 from playwright.sync_api import Browser, Page, sync_playwright
 from progress.bar import Bar
+from requests import Response, get
 
 EPISODE_NUM: int = 1
 URL_TEMPLATE: Template = Template(
@@ -78,6 +80,33 @@ def getDownloadLinks(_id: int, page: Page, episodeCount: int) -> dict[
     return data
 
 
+def downloadFiles(
+    urls: Series,
+    barName: str,
+    outputDir: Path,
+    _id: int,
+    extension: str = "m3u8",
+) -> None:
+    counter: int = 1
+
+    url: str
+    with Bar(f"Downloading {barName} urls...", max=urls.size) as bar:
+        for url in urls:
+            outputPath: Path = Path(
+                outputDir,
+                f"{_id}_{counter}.{extension}",
+            )
+
+            resp: Response = get(url=url, timeout=60)
+
+            with open(file=outputPath, mode="w") as fp:
+                fp.write(resp.text)
+
+            counter += 1
+
+            bar.next()
+
+
 @click.command()
 @click.option(
     "-i",
@@ -87,23 +116,11 @@ def getDownloadLinks(_id: int, page: Page, episodeCount: int) -> dict[
     required=True,
     type=int,
 )
-@click.option(
-    "-o",
-    "--output",
-    "output",
-    help="JSON file to write output to",
-    required=True,
-    type=click.Path(
-        exists=False,
-        file_okay=True,
-        dir_okay=False,
-        writable=True,
-        resolve_path=True,
-        path_type=Path,
-    ),
-)
-def main(_id: int, output: Path) -> None:
+def main(_id: int) -> None:
+    outputDir: Path = Path(str(_id))
     url: str = URL_TEMPLATE.substitute(_id=_id, episode_num=1)
+
+    makedirs(name=outputDir, exist_ok=False)
 
     with sync_playwright() as p:
         browser: Browser = p.firefox.launch(headless=True)
@@ -130,7 +147,27 @@ def main(_id: int, output: Path) -> None:
             _id=_id, page=page, episodeCount=totalEpisodes
         )
 
-    dump(obj=data, fp=open(file=output, mode="w"), indent=4)
+    df: DataFrame = DataFrame(data=data)
+    df.to_json(
+        path_or_buf=Path(outputDir, f"{_id}.json"),
+        index=False,
+        indent=4,
+    )
+
+    downloadFiles(
+        urls=df["video"],
+        barName="video",
+        outputDir=outputDir,
+        _id=_id,
+    )
+
+    downloadFiles(
+        urls=df["subtitle"],
+        barName="subtitle",
+        outputDir=outputDir,
+        _id=_id,
+        extension="vtt",
+    )
 
 
 if __name__ == "__main__":
