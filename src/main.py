@@ -2,22 +2,54 @@ from collections import defaultdict
 from os import makedirs
 from pathlib import Path
 from string import Template
-from typing import List
+from typing import List, Tuple
 
 import click
+import m3u8
 from bs4 import BeautifulSoup, Tag
+from m3u8 import M3U8, Playlist
 from pandas import DataFrame, Series
 from playwright.sync_api import Browser, Page, sync_playwright
 from progress.bar import Bar
 from requests import Response, get
 
 EPISODE_NUM: int = 1
+TIMEOUT_MS: int = 60000
 URL_TEMPLATE: Template = Template(
     template="https://www.miruro.tv/watch?id=${_id}&ep=${episode_num}"
 )
 
 
+def updatePage(page: Page, url: str) -> None:
+    page.goto(url=url, timeout=TIMEOUT_MS)
+
+    page.wait_for_selector(
+        selector="video",
+        timeout=TIMEOUT_MS,
+        state="visible",
+    )
+
+    page.wait_for_selector(
+        selector="source",
+        timeout=TIMEOUT_MS,
+        state="attached",
+    )
+
+    page.wait_for_selector(
+        selector="track",
+        timeout=TIMEOUT_MS,
+        state="attached",
+    )
+
+
+def identifySrc(name: str, videoTag: Tag) -> str:
+    return videoTag.find(name=name).get(key="src").__str__()
+
+
 def getEpisodeCount(page: Page) -> int:
+    """
+    Get the total number of episodes of a particular show ID
+    """
     soup: BeautifulSoup = BeautifulSoup(markup=page.content(), features="lxml")
 
     dropdown: Tag = soup.find(
@@ -35,6 +67,10 @@ def getDownloadLinks(_id: int, page: Page, episodeCount: int) -> dict[
     str,
     List[str],
 ]:
+    """
+    For each episode of a show ID, get the URL to the video source playlist
+    file and subtitle file
+    """
     data: dict[str, List[str]] = defaultdict(list)
 
     with Bar(
@@ -47,33 +83,24 @@ def getDownloadLinks(_id: int, page: Page, episodeCount: int) -> dict[
                 markup=page.content(),
                 features="lxml",
             )
-            videoElement: Tag = soup.find(name="video")
+            videoTag: Tag = soup.find(name="video")
 
             data["video"].append(
-                videoElement.find(name="source").get(key="src").__str__()
+                identifySrc(
+                    name="source",
+                    videoTag=videoTag,
+                )
             )
+
             data["subtitle"].append(
-                videoElement.find(name="track").get(key="src").__str__()
+                identifySrc(
+                    name="track",
+                    videoTag=videoTag,
+                )
             )
 
             url: str = URL_TEMPLATE.substitute(_id=_id, episode_num=eid + 1)
-
-            page.goto(url=url, timeout=6000)
-            page.wait_for_selector(
-                selector="video",
-                timeout=6000,
-                state="visible",
-            )
-            page.wait_for_selector(
-                selector="source",
-                timeout=6000,
-                state="attached",
-            )
-            page.wait_for_selector(
-                selector="track",
-                timeout=6000,
-                state="attached",
-            )
+            updatePage(page=page, url=url)
 
             bar.next()
 
@@ -87,6 +114,7 @@ def downloadFiles(
     _id: int,
     extension: str = "m3u8",
 ) -> None:
+    data: List[str] = []
     counter: int = 1
 
     url: str
@@ -99,12 +127,36 @@ def downloadFiles(
 
             resp: Response = get(url=url, timeout=60)
 
-            with open(file=outputPath, mode="w") as fp:
-                fp.write(resp.text)
+            if extension == "vtt":
+                with open(file=outputPath, mode="w") as fp:
+                    fp.write(resp.text)
+                    fp.close()
+                bar.next()
+                continue
 
-            counter += 1
+            playlist: M3U8 = m3u8.loads(content=resp.text)
+
+            hqPL: Playlist = playlist.playlists[0]
+
+            pl: Playlist
+            for pl in playlist.playlists:
+                """
+                Iterate through playlists in m3u8 file and identify the highest
+                quality playlist
+                """
+                hqRes: Tuple[int, int] = hqPL.stream_info.resolution
+
+                if pl.stream_info.resolution[0] > hqRes[0]:
+                    hqPL = pl
+
+            url = "/".join(url.split(sep="/")[0:-1]) + "/" + hqPL.uri
+
+            data.append(url)
 
             bar.next()
+
+    with open(file=Path(outputDir, "playlists.txt"), mode="w") as fp:
+        fp.writelines(data)
 
 
 @click.command()
@@ -125,22 +177,8 @@ def main(_id: int) -> None:
     with sync_playwright() as p:
         browser: Browser = p.firefox.launch(headless=True)
         page: Page = browser.new_page()
-        page.goto(url=url, timeout=6000)
-        page.wait_for_selector(
-            selector="video",
-            timeout=6000,
-            state="visible",
-        )
-        page.wait_for_selector(
-            selector="source",
-            timeout=6000,
-            state="attached",
-        )
-        page.wait_for_selector(
-            selector="track",
-            timeout=6000,
-            state="attached",
-        )
+
+        updatePage(page=page, url=url)
 
         totalEpisodes: int = getEpisodeCount(page=page)
         data: dict[str, List[str]] = getDownloadLinks(
