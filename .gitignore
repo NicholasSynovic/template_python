@@ -160,3 +160,6 @@ cython_debug/
 #.idea/
 build-docs/*
 *.json
+*.vtt
+*.m3u8
+*.txt
