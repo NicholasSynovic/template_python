@@ -13,6 +13,7 @@ create-dev:
 		. env/bin/activate; \
 		pip install -r requirements.txt; \
 		poetry install; \
+		playwright install --only-shell chromium; \
 		deactivate; \
 	)
 
