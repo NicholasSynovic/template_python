@@ -131,6 +131,7 @@ def downloadFiles(
                 with open(file=outputPath, mode="w") as fp:
                     fp.write(resp.text)
                     fp.close()
+                counter += 1
                 bar.next()
                 continue
 
@@ -149,7 +150,7 @@ def downloadFiles(
                 if pl.stream_info.resolution[0] > hqRes[0]:
                     hqPL = pl
 
-            url = "/".join(url.split(sep="/")[0:-1]) + "/" + hqPL.uri
+            url = "/".join(url.split(sep="/")[0:-1]) + "/" + hqPL.uri + "\n"
 
             data.append(url)
 
@@ -157,6 +158,7 @@ def downloadFiles(
 
     with open(file=Path(outputDir, "playlists.txt"), mode="w") as fp:
         fp.writelines(data)
+        fp.close()
 
 
 @click.command()
@@ -193,18 +195,18 @@ def main(_id: int) -> None:
     )
 
     downloadFiles(
-        urls=df["video"],
-        barName="video",
-        outputDir=outputDir,
-        _id=_id,
-    )
-
-    downloadFiles(
         urls=df["subtitle"],
         barName="subtitle",
         outputDir=outputDir,
         _id=_id,
         extension="vtt",
+    )
+
+    downloadFiles(
+        urls=df["video"],
+        barName="video",
+        outputDir=outputDir,
+        _id=_id,
     )
 
 
