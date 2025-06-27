@@ -1,19 +1,26 @@
-[tool.poetry]
+[project]
 name = "src"
 version = "0.0.0"
 description = "Hello World"
-license = "GNU Affero"
-authors = ["Nicholas M. Synovic <nicholas.synovic@gmail.com>"]
+authors = [{ name = "Nicholas M. Synovic", email = "nicholas.synovic@gmail.com" }]
+requires-python = "~=3.13"
 readme = "README.md"
-homepage = "https://github.com/NicholasSynovic/template_python"
-repository = "https://github.com/NicholasSynovic/template_python"
+license = "AGPL-3.0-only"
 keywords = ["Template"]
-classifiers = ["Development Status :: 1 - Planning"]
+classifiers = [
+    "Development Status :: 1 - Planning",
+    "License :: OSI Approved :: GNU Affero General Public License v3",
+    "Programming Language :: Python :: 3.13"
+]
 
-[tool.poetry.dependencies]
-python = "^3.10"
+[project.urls]
+Homepage = "https://github.com/NicholasSynovic/template_python"
+Repository = "https://github.com/NicholasSynovic/template_python"
+
+[project.scripts]
+src = "src.main:main"
 
 
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
