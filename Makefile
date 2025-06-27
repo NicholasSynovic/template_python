@@ -9,12 +9,3 @@ create-dev:
 	pre-commit autoupdate
 	uv sync
 	uv build
-
-generate-db-diagram:
-	schemacrawler.sh \
-		--server=sqlite \
-		--database=prime.sqlite3 \
-		--info-level=standard \
-		--command=schema \
-		--output-format=png \
-		--output-file=docs/imgs/db_diagram.png
